@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задания Dystopia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .task {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .task h2 {
+            margin-top: 0;
+        }
+        .task p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Задания Dystopia</h1>
+    <div id="tasks-container"></div>
+
+    <script>
+        // Пример словаря с заданиями
+        const tasksDict = {
+            "task1": {
+                "name": "Задание 1",
+                "description": "Описание задания 1",
+                "display_method": "по времени",
+                "reward_type": "ресурсы в % от часа",
+                "timer_to_next_collection": "60 минут",
+                "availability_time": "1 сутки",
+                "targeting": "ru"
+            },
+            "task2": {
+                "name": "Задание 2",
+                "description": "Описание задания 2",
+                "display_method": "по количеству подписок",
+                "reward_type": "темная материя в абс. знач.",
+                "timer_to_next_collection": "2 часа",
+                "availability_time": "2 суток",
+                "targeting": "en"
+            }
+        };
+
+        // Функция для отображения заданий
+        function displayTasks(tasks) {
+            const tasksContainer = document.getElementById('tasks-container');
+
+            for (const taskId in tasks) {
+                const task = tasks[taskId];
+
+                // Создаем блок для задания
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+
+                // Добавляем заголовок задания
+                const taskTitle = document.createElement('h2');
+                taskTitle.textContent = task.name;
+                taskElement.appendChild(taskTitle);
+
+                // Добавляем описание задания
+                const taskDescription = document.createElement('p');
+                taskDescription.textContent = `Описание: ${task.description}`;
+                taskElement.appendChild(taskDescription);
+
+                // Добавляем способ показа
+                const displayMethod = document.createElement('p');
+                displayMethod.textContent = `Способ показа: ${task.display_method}`;
+                taskElement.appendChild(displayMethod);
+
+                // Добавляем вид награды
+                const rewardType = document.createElement('p');
+                rewardType.textContent = `Вид награды: ${task.reward_type}`;
+                taskElement.appendChild(rewardType);
+
+                // Добавляем таймер до следующего сбора
+                const timer = document.createElement('p');
+                timer.textContent = `Таймер до следующего сбора: ${task.timer_to_next_collection}`;
+                taskElement.appendChild(timer);
+
+                // Добавляем время доступности
+                const availabilityTime = document.createElement('p');
+                availabilityTime.textContent = `Время доступности: ${task.availability_time}`;
+                taskElement.appendChild(availabilityTime);
+
+                // Добавляем таргетинг
+                const targeting = document.createElement('p');
+                targeting.textContent = `Таргетинг: ${task.targeting}`;
+                taskElement.appendChild(targeting);
+
+                // Добавляем задание в контейнер
+                tasksContainer.appendChild(taskElement);
+            }
+        }
+
+        // Выводим задания на экран
+        displayTasks(tasksDict);
+    </script>
+</body>
+</html>
