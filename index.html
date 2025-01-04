@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Задания Dystopia</title>
+    <title>Редактирование заданий Dystopia</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,13 +20,33 @@
         .task h2 {
             margin-top: 0;
         }
-        .task p {
-            margin: 5px 0;
+        .task label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        .task input, .task textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .task button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .task button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <h1>Задания Dystopia</h1>
+    <h1>Редактирование заданий Dystopia</h1>
     <div id="tasks-container"></div>
 
     <script>
@@ -52,7 +72,7 @@
             }
         };
 
-        // Функция для отображения заданий
+        // Функция для отображения заданий с полями ввода
         function displayTasks(tasks) {
             const tasksContainer = document.getElementById('tasks-container');
 
@@ -68,35 +88,77 @@
                 taskTitle.textContent = task.name;
                 taskElement.appendChild(taskTitle);
 
-                // Добавляем описание задания
-                const taskDescription = document.createElement('p');
-                taskDescription.textContent = `Описание: ${task.description}`;
-                taskElement.appendChild(taskDescription);
+                // Поле ввода для описания
+                const descriptionLabel = document.createElement('label');
+                descriptionLabel.textContent = 'Описание:';
+                taskElement.appendChild(descriptionLabel);
 
-                // Добавляем способ показа
-                const displayMethod = document.createElement('p');
-                displayMethod.textContent = `Способ показа: ${task.display_method}`;
-                taskElement.appendChild(displayMethod);
+                const descriptionInput = document.createElement('textarea');
+                descriptionInput.value = task.description;
+                taskElement.appendChild(descriptionInput);
 
-                // Добавляем вид награды
-                const rewardType = document.createElement('p');
-                rewardType.textContent = `Вид награды: ${task.reward_type}`;
-                taskElement.appendChild(rewardType);
+                // Поле ввода для способа показа
+                const displayMethodLabel = document.createElement('label');
+                displayMethodLabel.textContent = 'Способ показа:';
+                taskElement.appendChild(displayMethodLabel);
 
-                // Добавляем таймер до следующего сбора
-                const timer = document.createElement('p');
-                timer.textContent = `Таймер до следующего сбора: ${task.timer_to_next_collection}`;
-                taskElement.appendChild(timer);
+                const displayMethodInput = document.createElement('input');
+                displayMethodInput.value = task.display_method;
+                taskElement.appendChild(displayMethodInput);
 
-                // Добавляем время доступности
-                const availabilityTime = document.createElement('p');
-                availabilityTime.textContent = `Время доступности: ${task.availability_time}`;
-                taskElement.appendChild(availabilityTime);
+                // Поле ввода для вида награды
+                const rewardTypeLabel = document.createElement('label');
+                rewardTypeLabel.textContent = 'Вид награды:';
+                taskElement.appendChild(rewardTypeLabel);
 
-                // Добавляем таргетинг
-                const targeting = document.createElement('p');
-                targeting.textContent = `Таргетинг: ${task.targeting}`;
-                taskElement.appendChild(targeting);
+                const rewardTypeInput = document.createElement('input');
+                rewardTypeInput.value = task.reward_type;
+                taskElement.appendChild(rewardTypeInput);
+
+                // Поле ввода для таймера до следующего сбора
+                const timerLabel = document.createElement('label');
+                timerLabel.textContent = 'Таймер до следующего сбора:';
+                taskElement.appendChild(timerLabel);
+
+                const timerInput = document.createElement('input');
+                timerInput.value = task.timer_to_next_collection;
+                taskElement.appendChild(timerInput);
+
+                // Поле ввода для времени доступности
+                const availabilityTimeLabel = document.createElement('label');
+                availabilityTimeLabel.textContent = 'Время доступности:';
+                taskElement.appendChild(availabilityTimeLabel);
+
+                const availabilityTimeInput = document.createElement('input');
+                availabilityTimeInput.value = task.availability_time;
+                taskElement.appendChild(availabilityTimeInput);
+
+                // Поле ввода для таргетинга
+                const targetingLabel = document.createElement('label');
+                targetingLabel.textContent = 'Таргетинг:';
+                taskElement.appendChild(targetingLabel);
+
+                const targetingInput = document.createElement('input');
+                targetingInput.value = task.targeting;
+                taskElement.appendChild(targetingInput);
+
+                // Кнопка для сохранения изменений
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Сохранить изменения';
+                saveButton.addEventListener('click', () => {
+                    // Обновляем данные задания
+                    tasks[taskId] = {
+                        name: task.name,
+                        description: descriptionInput.value,
+                        display_method: displayMethodInput.value,
+                        reward_type: rewardTypeInput.value,
+                        timer_to_next_collection: timerInput.value,
+                        availability_time: availabilityTimeInput.value,
+                        targeting: targetingInput.value
+                    };
+                    alert('Изменения сохранены!');
+                });
+                taskElement.appendChild(saveButton);
 
                 // Добавляем задание в контейнер
                 tasksContainer.appendChild(taskElement);
