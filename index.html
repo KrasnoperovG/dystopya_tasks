@@ -25,7 +25,7 @@
             margin: 10px 0 5px;
             font-weight: bold;
         }
-        .task input, .task textarea {
+        .task input, .task textarea, .task select {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
@@ -106,14 +106,22 @@
                 displayMethodInput.value = task.display_method;
                 taskElement.appendChild(displayMethodInput);
 
-                // Поле ввода для вида награды
+                // Поле ввода для вида награды (выпадающий список)
                 const rewardTypeLabel = document.createElement('label');
                 rewardTypeLabel.textContent = 'Вид награды:';
                 taskElement.appendChild(rewardTypeLabel);
 
-                const rewardTypeInput = document.createElement('input');
-                rewardTypeInput.value = task.reward_type;
-                taskElement.appendChild(rewardTypeInput);
+                const rewardTypeSelect = document.createElement('select');
+                const rewardTypeOption1 = document.createElement('option');
+                rewardTypeOption1.value = "ресурсы в % от часа";
+                rewardTypeOption1.textContent = "ресурсы в % от часа";
+                const rewardTypeOption2 = document.createElement('option');
+                rewardTypeOption2.value = "темная материя в абс. знач.";
+                rewardTypeOption2.textContent = "темная материя в абс. знач.";
+                rewardTypeSelect.appendChild(rewardTypeOption1);
+                rewardTypeSelect.appendChild(rewardTypeOption2);
+                rewardTypeSelect.value = task.reward_type; // Устанавливаем текущее значение
+                taskElement.appendChild(rewardTypeSelect);
 
                 // Поле ввода для таймера до следующего сбора
                 const timerLabel = document.createElement('label');
@@ -151,7 +159,7 @@
                         name: task.name,
                         description: descriptionInput.value,
                         display_method: displayMethodInput.value,
-                        reward_type: rewardTypeInput.value,
+                        reward_type: rewardTypeSelect.value, // Используем значение из выпадающего списка
                         timer_to_next_collection: timerInput.value,
                         availability_time: availabilityTimeInput.value,
                         targeting: targetingInput.value
