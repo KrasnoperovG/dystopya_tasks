@@ -153,18 +153,37 @@
                 // Кнопка для сохранения изменений
                 const saveButton = document.createElement('button');
                 saveButton.textContent = 'Сохранить изменения';
-                saveButton.addEventListener('click', () => {
+                saveButton.addEventListener('click', async () => {
                     // Обновляем данные задания
-                    tasks[taskId] = {
+                    const updatedTask = {
                         name: task.name,
                         description: descriptionInput.value,
                         display_method: displayMethodInput.value,
-                        reward_type: rewardTypeSelect.value, // Используем значение из выпадающего списка
+                        reward_type: rewardTypeSelect.value,
                         timer_to_next_collection: timerInput.value,
                         availability_time: availabilityTimeInput.value,
                         targeting: targetingInput.value
                     };
-                    alert('Изменения сохранены!');
+
+                    // Отправляем данные на сервер
+                    try {
+                        const response = await fetch('/update-task', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ taskId, updatedTask })
+                        });
+
+                        if (response.ok) {
+                            alert('Изменения сохранены и отправлены в Telegram!');
+                        } else {
+                            alert('Ошибка при отправке данных.');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Ошибка при отправке данных.');
+                    }
                 });
                 taskElement.appendChild(saveButton);
 
