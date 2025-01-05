@@ -234,28 +234,31 @@
 
         // Функция для добавления нового задания
         function addTask() {
-            // Находим максимальный ID среди существующих заданий
-            const maxId = Object.keys(tasks).reduce((max, taskId) => {
-                const currentId = parseInt(taskId.replace("task", ""), 10);
-                return currentId > max ? currentId : max;
-            }, 0);
-
-            // Генерируем новый ID, увеличивая максимальный на 1
-            const newTaskId = `task${maxId + 1}`;
-
-            // Добавляем новое задание с стандартными значениями
-            tasks[newTaskId] = {
-                name: "",
-                description: "",
-                target_method: "for_time",
-                bonus_type: "resources",
-                timer_to_next_collection: "60",
-                availability_time_days: "1",
-                targeting: "ru"
-            };
-
-            // Перерисовываем задания
-            renderTasks();
+        // Находим максимальный ID среди существующих заданий
+        const maxId = Object.keys(tasks).reduce((max, taskId) => {
+            const currentId = parseInt(taskId.replace("task", ""), 10);
+            return currentId > max ? currentId : max;
+        }, 0);
+    
+        // Генерируем новый ID, увеличивая максимальный на 1
+        const newTaskId = `task${maxId + 1}`;
+    
+        // Добавляем новое задание со всеми необходимыми полями
+        tasks[newTaskId] = {
+            name: "",
+            description: "",
+            target_method: "for_time",
+            target_value: "",
+            bonus_type: "resources",
+            bonus_size: "10",
+            next_collection: "60",
+            availability_days: "1",
+            targeting: "ru",
+            link: ""
+        };
+    
+        // Перерисовываем задания
+        renderTasks();
         }
 
         // Обработчик кнопки "Добавить задание"
