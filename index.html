@@ -1,119 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Данные из URL</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        .task-block {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .task-block h3 {
-            margin-top: 0;
-        }
-        .task-block p {
-            margin: 5px 0;
-        }
-        button {
-            background-color: #4169E1;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #3556b7;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Tasks</title>
 </head>
 <body>
-    <h1>Данные из URL</h1>
-    <div id="tasks-container">
-        <!-- Сюда будут добавлены данные из URL -->
-    </div>
-    <button id="saveButton">Сохранить изменения</button>
+    <h1>Edit Tasks</h1>
+    <form id="taskForm">
+        <div id="tasksContainer"></div>
+        <button type="submit">Save</button>
+    </form>
 
     <script>
-        // Функция для разбора параметров URL
-        function parseUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const tasks = [];
+        // Функция для извлечения параметров из URL
+        function getQueryParams() {
+            const params = {};
+            window.location.search.substring(1).split('&').forEach(param => {
+                const [key, value] = param.split('=');
+                params[key] = decodeURIComponent(value);
+            });
+            return params;
+        }
 
-            // Перебираем все параметры из URL
-            urlParams.forEach((value, key) => {
+        // Функция для создания полей ввода для каждого задания
+        function createTaskFields(taskId, taskData) {
+            const container = document.createElement('div');
+            container.innerHTML = `<h2>Task: ${taskId}</h2>`;
+
+            for (const [key, value] of Object.entries(taskData)) {
+                const label = document.createElement('label');
+                label.innerText = key.replace('_', ' ') + ': ';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = `${taskId}_${key}`;
+                input.value = value;
+                container.appendChild(label);
+                container.appendChild(input);
+                container.appendChild(document.createElement('br'));
+            }
+
+            return container;
+        }
+
+        // Функция для инициализации формы
+        function initForm() {
+            const params = getQueryParams();
+            const tasksContainer = document.getElementById('tasksContainer');
+
+            for (const [key, value] of Object.entries(params)) {
                 if (key.startsWith('task_id')) {
+                    const taskId = value.split('|')[0].split('=')[1];
                     const taskData = {};
-                    const taskElements = value.split('|');
-
-                    // Разбираем каждый элемент задания
-                    taskElements.forEach(element => {
-                        const [dataKey, dataValue] = element.split('=');
-                        taskData[dataKey] = decodeURIComponent(dataValue.replace(/_/g, ' ')); // Заменяем подчеркивания на пробелы
+                    value.split('|').forEach(param => {
+                        const [k, v] = param.split('=');
+                        taskData[k] = v;
                     });
-
-                    tasks.push(taskData);
+                    tasksContainer.appendChild(createTaskFields(taskId, taskData));
                 }
-            });
-
-            return tasks;
-        }
-
-        // Функция для отображения данных на странице
-        function displayTasks(tasks) {
-            const tasksContainer = document.getElementById('tasks-container');
-
-            // Очищаем контейнер перед добавлением новых данных
-            tasksContainer.innerHTML = '';
-
-            tasks.forEach(task => {
-                const taskBlock = document.createElement('div');
-                taskBlock.className = 'task-block';
-
-                // Добавляем заголовок задания
-                const taskTitle = document.createElement('h3');
-                taskTitle.textContent = `Задание: ${task.name || 'Нет названия'}`;
-                taskBlock.appendChild(taskTitle);
-
-                // Добавляем остальные данные задания
-                for (const [key, value] of Object.entries(task)) {
-                    if (key !== 'name') { // Пропускаем название, так как оно уже в заголовке
-                        const taskDetail = document.createElement('p');
-                        taskDetail.textContent = `${key}: ${value}`;
-                        taskBlock.appendChild(taskDetail);
-                    }
-                }
-
-                tasksContainer.appendChild(taskBlock);
-            });
-        }
-
-        // Основная функция
-        function main() {
-            const tasks = parseUrlParams(); // Получаем данные из URL
-            if (tasks.length > 0) {
-                displayTasks(tasks); // Отображаем данные на странице
-            } else {
-                const tasksContainer = document.getElementById('tasks-container');
-                tasksContainer.textContent = "Нет данных для отображения.";
             }
         }
 
-        // Обработчик нажатия на кнопку "Сохранить изменения"
-        document.getElementById('saveButton').addEventListener('click', () => {
-            alert('Изменения сохранены!');
+        // Обработчик отправки формы
+        document.getElementById('taskForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                const [taskId, field] = key.split('_');
+                if (!data[taskId]) {
+                    data[taskId] = {};
+                }
+                data[taskId][field] = value;
+            });
+
+            // Отправляем данные обратно в Telegram бот
+            Telegram.WebApp.sendData(JSON.stringify(data));
         });
 
-        // Запускаем основную функцию при загрузке страницы
-        main();
+        // Инициализация формы при загрузке страницы
+        initForm();
     </script>
 </body>
 </html>
