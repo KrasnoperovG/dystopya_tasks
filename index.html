@@ -17,6 +17,7 @@
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
+            position: relative; /* Для позиционирования кнопки удаления */
         }
         .task h3 {
             margin-top: 0;
@@ -45,6 +46,24 @@
             resize: vertical; /* Разрешаем изменение высоты */
             min-height: 50px; /* Минимальная высота */
         }
+        .task .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .task .delete-btn:hover {
+            background-color: #cc0000;
+        }
         button {
             padding: 10px 20px;
             background-color: #28a745;
@@ -52,6 +71,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-bottom: 20px;
         }
         button:hover {
             background-color: #218838;
@@ -60,6 +80,7 @@
 </head>
 <body>
     <h1>Edit Tasks Dictionary</h1>
+    <button id="add-task-button">Добавить задание</button>
     <div id="tasks-container"></div>
     <button id="submit-button">Отправить</button>
 
@@ -81,137 +102,173 @@
         const params = getQueryParams();
         const tasksEncoded = params.tasks;
 
+        // Глобальная переменная для хранения заданий
+        let tasks = {};
+
         if (tasksEncoded) {
             try {
                 // Декодируем и парсим JSON
-                const tasks = JSON.parse(tasksEncoded);
-
-                // Выводим словарь на страницу с полями ввода
-                const tasksContainer = document.getElementById('tasks-container');
-
-                for (const [taskId, taskData] of Object.entries(tasks)) {
-                    const taskDiv = document.createElement('div');
-                    taskDiv.className = 'task';
-
-                    const taskTitle = document.createElement('h3');
-                    taskTitle.textContent = `Task ID: ${taskId}`;
-                    taskDiv.appendChild(taskTitle);
-
-                    for (const [key, value] of Object.entries(taskData)) {
-                        const fieldDiv = document.createElement('div');
-                        fieldDiv.className = 'field';
-
-                        const label = document.createElement('label');
-                        label.textContent = `${key}:`;
-                        fieldDiv.appendChild(label);
-
-                        if (key === "display_method" || key === "reward_type" || key === "targeting") {
-                            // Создаем выпадающий список для display_method, reward_type и targeting
-                            const select = document.createElement('select');
-                            select.id = `${taskId}-${key}`;
-
-                            // Варианты для display_method
-                            if (key === "display_method") {
-                                const option1 = document.createElement('option');
-                                option1.value = "for_time";
-                                option1.textContent = "for_time";
-                                select.appendChild(option1);
-
-                                const option2 = document.createElement('option');
-                                option2.value = "for_subscribes";
-                                option2.textContent = "for_subscribes";
-                                select.appendChild(option2);
-                            }
-
-                            // Варианты для reward_type
-                            if (key === "reward_type") {
-                                const option1 = document.createElement('option');
-                                option1.value = "matter";
-                                option1.textContent = "matter";
-                                select.appendChild(option1);
-
-                                const option2 = document.createElement('option');
-                                option2.value = "resources";
-                                option2.textContent = "resources";
-                                select.appendChild(option2);
-                            }
-
-                            // Варианты для targeting
-                            if (key === "targeting") {
-                                const option1 = document.createElement('option');
-                                option1.value = "ru";
-                                option1.textContent = "ru";
-                                select.appendChild(option1);
-
-                                const option2 = document.createElement('option');
-                                option2.value = "en";
-                                option2.textContent = "en";
-                                select.appendChild(option2);
-                            }
-
-                            // Устанавливаем выбранное значение
-                            select.value = value;
-                            fieldDiv.appendChild(select);
-                        } else if (key === "description") {
-                            // Для поля description создаем textarea
-                            const textarea = document.createElement('textarea');
-                            textarea.value = value;
-                            textarea.id = `${taskId}-${key}`;
-                            fieldDiv.appendChild(textarea);
-                        } else {
-                            // Для остальных полей создаем текстовое поле ввода
-                            const input = document.createElement('input');
-                            input.type = 'text';
-                            input.value = value;
-                            input.id = `${taskId}-${key}`;
-                            fieldDiv.appendChild(input);
-                        }
-
-                        taskDiv.appendChild(fieldDiv);
-                    }
-
-                    tasksContainer.appendChild(taskDiv);
-                }
-
-                // Обработчик кнопки "Отправить"
-                document.getElementById('submit-button').addEventListener('click', () => {
-                    // Собираем данные из всех блоков заданий
-                    const tasksData = {};
-                    const taskBlocks = document.querySelectorAll('.task');
-
-                    taskBlocks.forEach(taskBlock => {
-                        const inputs = taskBlock.querySelectorAll('input, select, textarea');
-                        const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
-                        tasksData[taskId] = {};
-
-                        inputs.forEach(input => {
-                            const key = input.id.split('-')[1];
-                            tasksData[taskId][key] = input.value;
-                        });
-                    });
-
-                    // Преобразуем данные в JSON
-                    const jsonData = JSON.stringify(tasksData);
-
-                    // Проверяем, доступен ли Telegram WebApp API
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        // Отправляем данные в Telegram и закрываем веб-приложение
-                        window.Telegram.WebApp.sendData(jsonData);
-                        window.Telegram.WebApp.close();
-                    } else {
-                        // Если API недоступен, выводим сообщение об ошибке
-                        alert('Ошибка: Telegram WebApp API недоступен. Пожалуйста, откройте это приложение в Telegram.');
-                        console.log("Данные для отправки:", jsonData);
-                    }
-                });
-
+                tasks = JSON.parse(tasksEncoded);
             } catch (error) {
                 console.error('Error parsing tasks:', error);
-                document.getElementById('tasks-container').innerHTML = '<p>Ошибка загрузки заданий. Проверьте URL.</p>';
             }
-        } else {
-            document.getElementById('tasks-container').innerHTML = '<p>Данные заданий не найдены в URL.</p>';
         }
+
+        // Функция для отображения заданий
+        function renderTasks() {
+            const tasksContainer = document.getElementById('tasks-container');
+            tasksContainer.innerHTML = ''; // Очищаем контейнер
+
+            for (const [taskId, taskData] of Object.entries(tasks)) {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task';
+
+                const taskTitle = document.createElement('h3');
+                taskTitle.textContent = `Task ID: ${taskId}`;
+                taskDiv.appendChild(taskTitle);
+
+                // Кнопка удаления задания
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.textContent = '❌';
+                deleteButton.onclick = () => deleteTask(taskId);
+                taskDiv.appendChild(deleteButton);
+
+                for (const [key, value] of Object.entries(taskData)) {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'field';
+
+                    const label = document.createElement('label');
+                    label.textContent = `${key}:`;
+                    fieldDiv.appendChild(label);
+
+                    if (key === "display_method" || key === "reward_type" || key === "targeting") {
+                        // Создаем выпадающий список для display_method, reward_type и targeting
+                        const select = document.createElement('select');
+                        select.id = `${taskId}-${key}`;
+
+                        // Варианты для display_method
+                        if (key === "display_method") {
+                            const option1 = document.createElement('option');
+                            option1.value = "for_time";
+                            option1.textContent = "for_time";
+                            select.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = "for_subscribes";
+                            option2.textContent = "for_subscribes";
+                            select.appendChild(option2);
+                        }
+
+                        // Варианты для reward_type
+                        if (key === "reward_type") {
+                            const option1 = document.createElement('option');
+                            option1.value = "matter";
+                            option1.textContent = "matter";
+                            select.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = "resources";
+                            option2.textContent = "resources";
+                            select.appendChild(option2);
+                        }
+
+                        // Варианты для targeting
+                        if (key === "targeting") {
+                            const option1 = document.createElement('option');
+                            option1.value = "ru";
+                            option1.textContent = "ru";
+                            select.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = "en";
+                            option2.textContent = "en";
+                            select.appendChild(option2);
+                        }
+
+                        // Устанавливаем выбранное значение
+                        select.value = value;
+                        fieldDiv.appendChild(select);
+                    } else if (key === "description") {
+                        // Для поля description создаем textarea
+                        const textarea = document.createElement('textarea');
+                        textarea.value = value;
+                        textarea.id = `${taskId}-${key}`;
+                        fieldDiv.appendChild(textarea);
+                    } else {
+                        // Для остальных полей создаем текстовое поле ввода
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = value;
+                        input.id = `${taskId}-${key}`;
+                        fieldDiv.appendChild(input);
+                    }
+
+                    taskDiv.appendChild(fieldDiv);
+                }
+
+                tasksContainer.appendChild(taskDiv);
+            }
+        }
+
+        // Функция для удаления задания
+        function deleteTask(taskId) {
+            delete tasks[taskId]; // Удаляем задание из объекта tasks
+            renderTasks(); // Перерисовываем задания
+        }
+
+        // Функция для добавления нового задания
+        function addTask() {
+            const newTaskId = `task${Object.keys(tasks).length + 1}`; // Генерируем новый ID задания
+            tasks[newTaskId] = {
+                name: "",
+                description: "",
+                display_method: "for_time",
+                reward_type: "resources",
+                timer_to_next_collection: "60",
+                availability_time_days: "1",
+                targeting: "ru"
+            };
+            renderTasks(); // Перерисовываем задания
+        }
+
+        // Обработчик кнопки "Добавить задание"
+        document.getElementById('add-task-button').addEventListener('click', addTask);
+
+        // Обработчик кнопки "Отправить"
+        document.getElementById('submit-button').addEventListener('click', () => {
+            // Собираем данные из всех блоков заданий
+            const tasksData = {};
+            const taskBlocks = document.querySelectorAll('.task');
+
+            taskBlocks.forEach(taskBlock => {
+                const inputs = taskBlock.querySelectorAll('input, select, textarea');
+                const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
+                tasksData[taskId] = {};
+
+                inputs.forEach(input => {
+                    const key = input.id.split('-')[1];
+                    tasksData[taskId][key] = input.value;
+                });
+            });
+
+            // Преобразуем данные в JSON
+            const jsonData = JSON.stringify(tasksData);
+
+            // Проверяем, доступен ли Telegram WebApp API
+            if (window.Telegram && window.Telegram.WebApp) {
+                // Отправляем данные в Telegram и закрываем веб-приложение
+                window.Telegram.WebApp.sendData(jsonData);
+                window.Telegram.WebApp.close();
+            } else {
+                // Если API недоступен, выводим сообщение об ошибке
+                alert('Ошибка: Telegram WebApp API недоступен. Пожалуйста, откройте это приложение в Telegram.');
+                console.log("Данные для отправки:", jsonData);
+            }
+        });
+
+        // Первоначальная отрисовка заданий
+        renderTasks();
     </script>
 </body>
 </html>
