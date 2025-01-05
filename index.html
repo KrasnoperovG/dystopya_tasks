@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks Dictionary</title>
+    <title>Edit Tasks Dictionary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,14 +18,33 @@
         .task h3 {
             margin-top: 0;
         }
-        .task p {
+        .task label {
+            display: block;
             margin: 5px 0;
+        }
+        .task input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <h1>Tasks Dictionary</h1>
+    <h1>Edit Tasks Dictionary</h1>
     <div id="tasks-container"></div>
+    <button id="submit-button">Отправить</button>
 
     <script>
         // Функция для получения параметров из URL
@@ -47,7 +66,7 @@
                 // Декодируем и парсим JSON
                 const tasks = JSON.parse(tasksEncoded);
 
-                // Выводим словарь на страницу
+                // Выводим словарь на страницу с полями ввода
                 const tasksContainer = document.getElementById('tasks-container');
 
                 for (const [taskId, taskData] of Object.entries(tasks)) {
@@ -59,13 +78,45 @@
                     taskDiv.appendChild(taskTitle);
 
                     for (const [key, value] of Object.entries(taskData)) {
-                        const taskDetail = document.createElement('p');
-                        taskDetail.textContent = `${key}: ${value}`;
-                        taskDiv.appendChild(taskDetail);
+                        const label = document.createElement('label');
+                        label.textContent = `${key}:`;
+                        taskDiv.appendChild(label);
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = value;
+                        input.dataset.taskId = taskId;
+                        input.dataset.key = key;
+                        taskDiv.appendChild(input);
                     }
 
                     tasksContainer.appendChild(taskDiv);
                 }
+
+                // Обработчик кнопки "Отправить"
+                document.getElementById('submit-button').addEventListener('click', () => {
+                    const updatedTasks = {};
+
+                    // Собираем данные из полей ввода
+                    document.querySelectorAll('.task input').forEach(input => {
+                        const taskId = input.dataset.taskId;
+                        const key = input.dataset.key;
+                        const value = input.value;
+
+                        if (!updatedTasks[taskId]) {
+                            updatedTasks[taskId] = {};
+                        }
+                        updatedTasks[taskId][key] = value;
+                    });
+
+                    // Отправляем обновленные данные в Telegram
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        window.Telegram.WebApp.sendData(JSON.stringify(updatedTasks));
+                    } else {
+                        console.error('Telegram WebApp API is not available.');
+                    }
+                });
+
             } catch (error) {
                 console.error('Error parsing tasks:', error);
                 document.getElementById('tasks-container').innerHTML = '<p>Error loading tasks. Please check the URL.</p>';
