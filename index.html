@@ -65,25 +65,40 @@
         .task .delete-btn:hover {
             background-color: #ff6666; /* Бледно-красный цвет при наведении */
         }
-        button {
+        .buttons-container {
+            display: flex;
+            justify-content: flex-end; /* Выравниваем кнопки по правому краю */
+            gap: 10px; /* Расстояние между кнопками */
+            margin-top: 20px; /* Отступ сверху */
+        }
+        .buttons-container button {
             padding: 10px 20px;
             background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 20px;
         }
-        button:hover {
+        .buttons-container button:hover {
             background-color: #218838;
+        }
+        #add-task-button {
+            background-color: #007bff; /* Синий цвет для кнопки "Добавить задание" */
+        }
+        #add-task-button:hover {
+            background-color: #0056b3; /* Темно-синий цвет при наведении */
         }
     </style>
 </head>
 <body>
     <h1>Edit Tasks Dictionary</h1>
-    <button id="add-task-button">Добавить задание</button>
     <div id="tasks-container"></div>
-    <button id="submit-button">Отправить</button>
+
+    <!-- Контейнер для кнопок "Отправить" и "Добавить задание" -->
+    <div class="buttons-container">
+        <button id="submit-button">Отправить</button>
+        <button id="add-task-button">Добавить задание</button>
+    </div>
 
     <!-- Подключаем Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
