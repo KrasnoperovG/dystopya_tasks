@@ -22,16 +22,20 @@
             margin-top: 0;
             color: #666; /* Светло-серый цвет для заголовка "Task ID: task1" */
         }
-        .task label {
-            display: block;
-            margin: 5px 0;
+        .task .field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .task .field label {
+            margin-right: 10px;
             color: #666; /* Светло-серый цвет для подписей полей ввода */
+            min-width: 120px; /* Фиксированная ширина для выравнивания */
         }
         .task input,
         .task select {
-            width: 100%;
+            flex: 1;
             padding: 5px;
-            margin-bottom: 10px;
             box-sizing: border-box;
         }
         button {
@@ -87,9 +91,12 @@
                     taskDiv.appendChild(taskTitle);
 
                     for (const [key, value] of Object.entries(taskData)) {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'field';
+
                         const label = document.createElement('label');
                         label.textContent = `${key}:`;
-                        taskDiv.appendChild(label);
+                        fieldDiv.appendChild(label);
 
                         if (key === "display_method" || key === "reward_type" || key === "targeting") {
                             // Создаем выпадающий список для display_method, reward_type и targeting
@@ -137,15 +144,17 @@
 
                             // Устанавливаем выбранное значение
                             select.value = value;
-                            taskDiv.appendChild(select);
+                            fieldDiv.appendChild(select);
                         } else {
                             // Для остальных полей создаем текстовое поле ввода
                             const input = document.createElement('input');
                             input.type = 'text';
                             input.value = value;
                             input.id = `${taskId}-${key}`;
-                            taskDiv.appendChild(input);
+                            fieldDiv.appendChild(input);
                         }
+
+                        taskDiv.appendChild(fieldDiv);
                     }
 
                     tasksContainer.appendChild(taskDiv);
