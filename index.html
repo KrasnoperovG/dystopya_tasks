@@ -33,10 +33,15 @@
             min-width: 120px; /* Фиксированная ширина для выравнивания */
         }
         .task input,
-        .task select {
+        .task select,
+        .task textarea {
             flex: 1;
             padding: 5px;
             box-sizing: border-box;
+        }
+        .task textarea {
+            resize: vertical; /* Разрешаем изменение высоты */
+            min-height: 50px; /* Минимальная высота */
         }
         button {
             padding: 10px 20px;
@@ -145,6 +150,12 @@
                             // Устанавливаем выбранное значение
                             select.value = value;
                             fieldDiv.appendChild(select);
+                        } else if (key === "description") {
+                            // Для поля description создаем textarea
+                            const textarea = document.createElement('textarea');
+                            textarea.value = value;
+                            textarea.id = `${taskId}-${key}`;
+                            fieldDiv.appendChild(textarea);
                         } else {
                             // Для остальных полей создаем текстовое поле ввода
                             const input = document.createElement('input');
@@ -167,7 +178,7 @@
                     const taskBlocks = document.querySelectorAll('.task');
 
                     taskBlocks.forEach(taskBlock => {
-                        const inputs = taskBlock.querySelectorAll('input, select');
+                        const inputs = taskBlock.querySelectorAll('input, select, textarea');
                         const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
                         tasksData[taskId] = {};
 
