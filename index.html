@@ -20,11 +20,25 @@
         .task-block p {
             margin: 5px 0;
         }
+        button {
+            background-color: #4169E1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #3556b7;
+        }
     </style>
 </head>
 <body>
     <h1>Данные из URL</h1>
     <div id="tasks-container"></div>
+    <button id="saveButton">Сохранить изменения</button>
 
     <script>
         // Функция для разбора параметров URL
@@ -82,6 +96,11 @@
             const tasks = parseUrlParams(); // Получаем данные из URL
             displayTasks(tasks); // Отображаем данные на странице
         }
+
+        // Обработчик нажатия на кнопку "Сохранить изменения"
+        document.getElementById('saveButton').addEventListener('click', () => {
+            alert('Изменения сохранены!');
+        });
 
         // Запускаем основную функцию при загрузке страницы
         main();
