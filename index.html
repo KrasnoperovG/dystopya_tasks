@@ -65,16 +65,29 @@
         .task .delete-btn:hover {
             background-color: #ff6666; /* Бледно-красный цвет при наведении */
         }
-        button {
+        #add-task-button {
+            background-color: #007bff; /* Синий цвет */
+            color: white;
+            border: none;
+            border-radius: 5px;
             padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease; /* Плавное изменение цвета */
+        }
+        #add-task-button:hover {
+            background-color: #0056b3; /* Темно-синий цвет при наведении */
+        }
+        #submit-button {
             background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
+            padding: 10px 20px;
             cursor: pointer;
             margin-bottom: 20px;
         }
-        button:hover {
+        #submit-button:hover {
             background-color: #218838;
         }
     </style>
@@ -220,7 +233,16 @@
 
         // Функция для добавления нового задания
         function addTask() {
-            const newTaskId = `task${Object.keys(tasks).length + 1}`; // Генерируем новый ID задания
+            // Находим максимальный ID среди существующих заданий
+            const maxId = Object.keys(tasks).reduce((max, taskId) => {
+                const currentId = parseInt(taskId.replace("task", ""), 10);
+                return currentId > max ? currentId : max;
+            }, 0);
+
+            // Генерируем новый ID, увеличивая максимальный на 1
+            const newTaskId = `task${maxId + 1}`;
+
+            // Добавляем новое задание с стандартными значениями
             tasks[newTaskId] = {
                 name: "",
                 description: "",
@@ -230,7 +252,9 @@
                 availability_time_days: "1",
                 targeting: "ru"
             };
-            renderTasks(); // Перерисовываем задания
+
+            // Перерисовываем задания
+            renderTasks();
         }
 
         // Обработчик кнопки "Добавить задание"
