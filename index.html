@@ -1,94 +1,77 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Задания</title>
+    <title>Task Parameters</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        .task {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .task h2 {
-            margin-top: 0;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
-        .task p {
-            margin: 5px 0;
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1>Список заданий</h1>
-    <div id="tasks-container"></div>
+    <h1>Task Parameters</h1>
+    <table id="taskTable">
+        <thead>
+            <tr>
+                <th>Название строки</th>
+                <th>Значение</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Данные будут вставлены сюда -->
+        </tbody>
+    </table>
 
     <script>
-        // Функция для парсинга параметров URL
+        // Функция для получения параметров из URL
         function getQueryParams() {
             const params = {};
             const queryString = window.location.search.substring(1);
             const pairs = queryString.split('&');
-
-            pairs.forEach(pair => {
+            for (const pair of pairs) {
                 const [key, value] = pair.split('=');
-                if (key && value) {
-                    params[key] = decodeURIComponent(value);
-                }
-            });
-
+                params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+            }
             return params;
         }
 
-        // Функция для отображения заданий
-        function displayTasks() {
-            const tasksContainer = document.getElementById('tasks-container');
-            const queryParams = getQueryParams();
+        // Функция для отображения параметров в таблице
+        function displayParams() {
+            const params = getQueryParams();
+            const tableBody = document.querySelector('#taskTable tbody');
 
-            // Очищаем контейнер перед добавлением новых данных
-            tasksContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(params)) {
+                const row = document.createElement('tr');
+                const keyCell = document.createElement('td');
+                const valueCell = document.createElement('td');
 
-            // Перебираем все параметры URL
-            for (const key in queryParams) {
-                if (key.startsWith('task_id')) {
-                    const taskData = queryParams[key].split('|');
-                    const task = {};
+                keyCell.textContent = key;
+                valueCell.textContent = value;
 
-                    // Парсим данные задания
-                    taskData.forEach(item => {
-                        const [itemKey, itemValue] = item.split('=');
-                        task[itemKey] = itemValue;
-                    });
-
-                    // Создаем HTML для задания
-                    const taskElement = document.createElement('div');
-                    taskElement.className = 'task';
-
-                    const taskTitle = document.createElement('h2');
-                    taskTitle.textContent = `Задание: ${task.task_id || 'Нет ID'}`;
-                    taskElement.appendChild(taskTitle);
-
-                    // Перебираем все поля задания и отображаем их
-                    for (const field in task) {
-                        if (field !== 'task_id') { // Пропускаем task_id, так как он уже в заголовке
-                            const fieldElement = document.createElement('p');
-                            fieldElement.textContent = `${field}: ${task[field] || 'Не указано'}`;
-                            taskElement.appendChild(fieldElement);
-                        }
-                    }
-
-                    // Добавляем задание в контейнер
-                    tasksContainer.appendChild(taskElement);
-                }
+                row.appendChild(keyCell);
+                row.appendChild(valueCell);
+                tableBody.appendChild(row);
             }
         }
 
-        // Вызываем функцию отображения заданий при загрузке страницы
-        window.onload = displayTasks;
+        // Вызов функции при загрузке страницы
+        window.onload = displayParams;
     </script>
 </body>
 </html>
