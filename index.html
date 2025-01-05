@@ -8,24 +8,21 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            font-size: 0.5em; /* Уменьшаем шрифт в два раза */
-            line-height: 1.2; /* Уменьшаем межстрочное расстояние */
         }
         h1 {
-            color: #666;
-            font-size: 1.5em; /* Уменьшаем размер заголовка */
+            color: #666; /* Светло-серый цвет для заголовка "Edit Tasks Dictionary" */
         }
         .task {
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
-            position: relative;
+            position: relative; /* Для позиционирования кнопки удаления */
         }
         .task h3 {
             margin-top: 0;
-            color: #666;
-            font-size: 1.2em; /* Уменьшаем размер заголовка задания */
+            color: #666; /* Светло-серый цвет для заголовка "Task ID: task1" */
+            font-size: 11px; /* Уменьшаем шрифт на 5px */
         }
         .task .field {
             display: flex;
@@ -34,9 +31,8 @@
         }
         .task .field label {
             margin-right: 10px;
-            color: #666;
-            min-width: 120px;
-            font-size: 0.8em; /* Уменьшаем размер текста меток */
+            color: #666; /* Светло-серый цвет для подписей полей ввода */
+            min-width: 120px; /* Фиксированная ширина для выравнивания */
         }
         .task input,
         .task select,
@@ -44,19 +40,18 @@
             flex: 1;
             padding: 5px;
             box-sizing: border-box;
-            min-width: 150px;
-            max-width: 300px;
-            font-size: 0.8em; /* Уменьшаем размер текста в полях ввода */
+            min-width: 150px; /* Минимальная ширина поля ввода/выпадающего списка */
+            max-width: 300px; /* Максимальная ширина поля ввода/выпадающего списка */
         }
         .task textarea {
-            resize: vertical;
-            min-height: 50px;
+            resize: vertical; /* Разрешаем изменение высоты */
+            min-height: 50px; /* Минимальная высота */
         }
         .task .delete-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #ccc;
+            background-color: #ccc; /* Серый цвет */
             color: white;
             border: none;
             border-radius: 50%;
@@ -66,24 +61,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease; /* Плавное изменение цвета */
         }
         .task .delete-btn:hover {
-            background-color: #ff6666;
+            background-color: #ff6666; /* Бледно-красный цвет при наведении */
         }
         #add-task-button {
-            background-color: #007bff;
+            background-color: #007bff; /* Синий цвет */
             color: white;
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
             cursor: pointer;
             margin-bottom: 20px;
-            transition: background-color 0.3s ease;
-            font-size: 0.8em; /* Уменьшаем размер текста кнопки */
+            transition: background-color 0.3s ease; /* Плавное изменение цвета */
         }
         #add-task-button:hover {
-            background-color: #0056b3;
+            background-color: #0056b3; /* Темно-синий цвет при наведении */
         }
         #submit-button {
             background-color: #28a745;
@@ -93,7 +87,6 @@
             padding: 10px 20px;
             cursor: pointer;
             margin-bottom: 20px;
-            font-size: 0.8em; /* Уменьшаем размер текста кнопки */
         }
         #submit-button:hover {
             background-color: #218838;
