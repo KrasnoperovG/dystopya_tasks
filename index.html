@@ -3,83 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Parameters</title>
+    <title>Tasks Dictionary</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .task {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+        .task h3 {
+            margin-top: 0;
         }
-        th {
-            background-color: #f2f2f2;
+        .task p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <h1>Task Parameters</h1>
-    <table id="taskTable">
-        <thead>
-            <tr>
-                <th>Название строки</th>
-                <th>Значение</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Данные будут вставлены сюда -->
-        </tbody>
-    </table>
+    <h1>Tasks Dictionary</h1>
+    <div id="tasks-container"></div>
 
     <script>
         // Функция для получения параметров из URL
         function getQueryParams() {
             const params = {};
-            const queryString = window.location.search.substring(1);
-            const pairs = queryString.split('&');
-            for (const pair of pairs) {
-                const [key, value] = pair.split('=');
-                params[decodeURIComponent(key)] = decodeURIComponent(value || '');
-            }
+            window.location.search.substring(1).split('&').forEach(param => {
+                const [key, value] = param.split('=');
+                params[decodeURIComponent(key)] = decodeURIComponent(value);
+            });
             return params;
         }
 
-        // Функция для отображения параметров в таблице
-        function displayParams() {
-            const params = getQueryParams();
-            const tableBody = document.querySelector('#taskTable tbody');
+        // Получаем параметр tasks из URL
+        const params = getQueryParams();
+        const tasksEncoded = params.tasks;
 
-            for (const [key, value] of Object.entries(params)) {
-                // Разделяем значение по символу "|"
-                const parts = value.split('|');
-                for (const part of parts) {
-                    // Разделяем каждую часть на ключ и значение
-                    const [subKey, subValue] = part.split('=');
-                    if (subKey && subValue) {
-                        const row = document.createElement('tr');
-                        const keyCell = document.createElement('td');
-                        const valueCell = document.createElement('td');
+        if (tasksEncoded) {
+            try {
+                // Декодируем и парсим JSON
+                const tasks = JSON.parse(tasksEncoded);
 
-                        keyCell.textContent = subKey;
-                        valueCell.textContent = subValue;
+                // Выводим словарь на страницу
+                const tasksContainer = document.getElementById('tasks-container');
 
-                        row.appendChild(keyCell);
-                        row.appendChild(valueCell);
-                        tableBody.appendChild(row);
+                for (const [taskId, taskData] of Object.entries(tasks)) {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task';
+
+                    const taskTitle = document.createElement('h3');
+                    taskTitle.textContent = `Task ID: ${taskId}`;
+                    taskDiv.appendChild(taskTitle);
+
+                    for (const [key, value] of Object.entries(taskData)) {
+                        const taskDetail = document.createElement('p');
+                        taskDetail.textContent = `${key}: ${value}`;
+                        taskDiv.appendChild(taskDetail);
                     }
-                }
-            }
-        }
 
-        // Вызов функции при загрузке страницы
-        window.onload = displayParams;
+                    tasksContainer.appendChild(taskDiv);
+                }
+            } catch (error) {
+                console.error('Error parsing tasks:', error);
+                document.getElementById('tasks-container').innerHTML = '<p>Error loading tasks. Please check the URL.</p>';
+            }
+        } else {
+            document.getElementById('tasks-container').innerHTML = '<p>No tasks data found in the URL.</p>';
+        }
     </script>
 </body>
 </html>
