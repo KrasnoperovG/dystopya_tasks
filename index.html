@@ -46,6 +46,9 @@
     <div id="tasks-container"></div>
     <button id="submit-button">Отправить</button>
 
+    <!-- Подключаем Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <script>
         // Функция для получения параметров из URL
         function getQueryParams() {
@@ -112,22 +115,24 @@
                     // Преобразуем данные в JSON
                     const jsonData = JSON.stringify(tasksData);
 
-                    // Отправляем данные в Telegram
+                    // Проверяем, доступен ли Telegram WebApp API
                     if (window.Telegram && window.Telegram.WebApp) {
+                        // Отправляем данные в Telegram и закрываем веб-приложение
                         window.Telegram.WebApp.sendData(jsonData);
-                        window.Telegram.WebApp.close(); // Закрываем веб-приложение
+                        window.Telegram.WebApp.close();
                     } else {
+                        // Если API недоступен, выводим сообщение об ошибке
+                        alert('Ошибка: Telegram WebApp API недоступен. Пожалуйста, откройте это приложение в Telegram.');
                         console.log("Данные для отправки:", jsonData);
-                        alert('Данные готовы к отправке: ' + jsonData);
                     }
                 });
 
             } catch (error) {
                 console.error('Error parsing tasks:', error);
-                document.getElementById('tasks-container').innerHTML = '<p>Error loading tasks. Please check the URL.</p>';
+                document.getElementById('tasks-container').innerHTML = '<p>Ошибка загрузки заданий. Проверьте URL.</p>';
             }
         } else {
-            document.getElementById('tasks-container').innerHTML = '<p>No tasks data found in the URL.</p>';
+            document.getElementById('tasks-container').innerHTML = '<p>Данные заданий не найдены в URL.</p>';
         }
     </script>
 </body>
