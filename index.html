@@ -91,8 +91,8 @@
                         label.textContent = `${key}:`;
                         taskDiv.appendChild(label);
 
-                        if (key === "display_method" || key === "reward_type") {
-                            // Создаем выпадающий список для display_method и reward_type
+                        if (key === "display_method" || key === "reward_type" || key === "targeting") {
+                            // Создаем выпадающий список для display_method, reward_type и targeting
                             const select = document.createElement('select');
                             select.id = `${taskId}-${key}`;
 
@@ -119,6 +119,19 @@
                                 const option2 = document.createElement('option');
                                 option2.value = "resources";
                                 option2.textContent = "resources";
+                                select.appendChild(option2);
+                            }
+
+                            // Варианты для targeting
+                            if (key === "targeting") {
+                                const option1 = document.createElement('option');
+                                option1.value = "ru";
+                                option1.textContent = "ru";
+                                select.appendChild(option1);
+
+                                const option2 = document.createElement('option');
+                                option2.value = "en";
+                                option2.textContent = "en";
                                 select.appendChild(option2);
                             }
 
