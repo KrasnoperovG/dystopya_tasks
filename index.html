@@ -156,13 +156,13 @@
                     label.textContent = `${key}:`;
                     fieldDiv.appendChild(label);
 
-                    if (key === "display_method" || key === "reward_type" || key === "targeting") {
-                        // Создаем выпадающий список для display_method, reward_type и targeting
+                    if (key === "target_method" || key === "bonus_type" || key === "targeting") {
+                        // Создаем выпадающий список для target_method, bonus_type и targeting
                         const select = document.createElement('select');
                         select.id = `${taskId}-${key}`;
 
-                        // Варианты для display_method
-                        if (key === "display_method") {
+                        // Варианты для target_method
+                        if (key === "target_method") {
                             const option1 = document.createElement('option');
                             option1.value = "for_time";
                             option1.textContent = "for_time";
@@ -174,8 +174,8 @@
                             select.appendChild(option2);
                         }
 
-                        // Варианты для reward_type
-                        if (key === "reward_type") {
+                        // Варианты для bonus_type
+                        if (key === "bonus_type") {
                             const option1 = document.createElement('option');
                             option1.value = "matter";
                             option1.textContent = "matter";
@@ -246,8 +246,8 @@
             tasks[newTaskId] = {
                 name: "",
                 description: "",
-                display_method: "for_time",
-                reward_type: "resources",
+                target_method: "for_time",
+                bonus_type: "resources",
                 timer_to_next_collection: "60",
                 availability_time_days: "1",
                 targeting: "ru"
