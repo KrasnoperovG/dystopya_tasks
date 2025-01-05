@@ -1,136 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Редактирование заданий</title>
+    <title>Данные из URL</title>
     <style>
         body {
-            color: var(--tg-theme-text-color);
-            background: var(--tg-theme-bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 15px;
+            font-family: Arial, sans-serif;
             padding: 20px;
         }
-
         .task-block {
             border: 1px solid #ccc;
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 5px;
-            width: 100%;
-            max-width: 400px;
+            background-color: #f9f9f9;
         }
-
-        .task-block label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+        .task-block h3 {
+            margin-top: 0;
         }
-
-        .task-block input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background: #4169E1;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: #3556b7;
+        .task-block p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <h1>Редактирование заданий</h1>
+    <h1>Данные из URL</h1>
     <div id="tasks-container"></div>
-    <button id="saveButton">Сохранить изменения</button>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // Получаем параметры из URL
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Функция для создания блока задания
-        function createTaskBlock(taskId, taskData) {
-            const taskBlock = document.createElement('div');
-            taskBlock.className = 'task-block';
-
-            // Добавляем поля ввода для каждого свойства задания
-            for (const [key, value] of Object.entries(taskData)) {
-                const label = document.createElement('label');
-                label.textContent = key.replace(/_/g, ' '); // Заменяем подчеркивания на пробелы
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = value;
-                input.id = `${taskId}-${key}`; // Уникальный ID для каждого поля
-
-                taskBlock.appendChild(label);
-                taskBlock.appendChild(input);
-            }
-
-            return taskBlock;
-        }
-
-        // Функция для загрузки заданий из URL
-        function loadTasks() {
-            const tasksContainer = document.getElementById('tasks-container');
+        // Функция для разбора параметров URL
+        function parseUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tasks = [];
 
             // Перебираем все параметры из URL
             urlParams.forEach((value, key) => {
                 if (key.startsWith('task_id')) {
-                    // Создаем объект с данными задания
                     const taskData = {};
                     const taskElements = value.split('|');
+
+                    // Разбираем каждый элемент задания
                     taskElements.forEach(element => {
                         const [dataKey, dataValue] = element.split('=');
-                        taskData[dataKey] = dataValue.replace(/_/g, ' '); // Заменяем подчеркивания на пробелы
+                        taskData[dataKey] = decodeURIComponent(dataValue.replace(/_/g, ' ')); // Заменяем подчеркивания на пробелы
                     });
 
-                    // Создаем блок задания и добавляем его в контейнер
-                    const taskBlock = createTaskBlock(key, taskData);
-                    tasksContainer.appendChild(taskBlock);
+                    tasks.push(taskData);
                 }
+            });
+
+            return tasks;
+        }
+
+        // Функция для отображения данных на странице
+        function displayTasks(tasks) {
+            const tasksContainer = document.getElementById('tasks-container');
+
+            tasks.forEach(task => {
+                const taskBlock = document.createElement('div');
+                taskBlock.className = 'task-block';
+
+                // Добавляем заголовок задания
+                const taskTitle = document.createElement('h3');
+                taskTitle.textContent = `Задание: ${task.name || 'Нет названия'}`;
+                taskBlock.appendChild(taskTitle);
+
+                // Добавляем остальные данные задания
+                for (const [key, value] of Object.entries(task)) {
+                    if (key !== 'name') { // Пропускаем название, так как оно уже в заголовке
+                        const taskDetail = document.createElement('p');
+                        taskDetail.textContent = `${key}: ${value}`;
+                        taskBlock.appendChild(taskDetail);
+                    }
+                }
+
+                tasksContainer.appendChild(taskBlock);
             });
         }
 
-        // Обработчик нажатия на кнопку "Сохранить изменения"
-        document.getElementById('saveButton').addEventListener('click', () => {
-            const tasksData = {};
+        // Основная функция
+        function main() {
+            const tasks = parseUrlParams(); // Получаем данные из URL
+            displayTasks(tasks); // Отображаем данные на странице
+        }
 
-            // Собираем данные из всех блоков заданий
-            const taskBlocks = document.querySelectorAll('.task-block');
-            taskBlocks.forEach(taskBlock => {
-                const inputs = taskBlock.querySelectorAll('input');
-                const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
-                tasksData[taskId] = {};
-
-                inputs.forEach(input => {
-                    const key = input.id.split('-')[1];
-                    tasksData[taskId][key] = input.value;
-                });
-            });
-
-            // Отправляем данные в Telegram
-            tg.sendData(JSON.stringify(tasksData));
-            tg.close(); // Закрываем веб-приложение
-        });
-
-        // Загружаем задания при загрузке страницы
-        loadTasks();
+        // Запускаем основную функцию при загрузке страницы
+        main();
     </script>
 </body>
 </html>
