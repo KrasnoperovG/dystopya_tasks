@@ -1,199 +1,54 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактирование заданий Dystopia</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Настройки</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
+            color: var(--tg-theme-text-color);
+            background: var(--tg-theme-bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 15px;
         }
-        .task {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-        .task h2 {
-            margin-top: 0;
-        }
-        .task label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-        }
-        .task input, .task textarea, .task select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .task button {
-            padding: 10px 15px;
-            background-color: #28a745;
-            color: white;
+
+        button {
+            background: White;
+            color: Black;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .task button:hover {
-            background-color: #218838;
+            font-size: 15px;
+            padding: 10px 20px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Редактирование заданий Dystopia</h1>
-    <div id="tasks-container"></div>
+    <h1>Параметры:</h1>
+    <div id="params"></div>
+    <button id="saveButton">Сохранить настройки</button>
 
     <script>
-        // Пример словаря с заданиями
-        const tasksDict = {
-            "task1": {
-                "name": "Задание 1",
-                "description": "Описание задания 1",
-                "display_method": "по времени",
-                "reward_type": "ресурсы в % от часа",
-                "timer_to_next_collection": "60 минут",
-                "availability_time": "1 сутки",
-                "targeting": "ru"
-            },
-            "task2": {
-                "name": "Задание 2",
-                "description": "Описание задания 2",
-                "display_method": "по количеству подписок",
-                "reward_type": "темная материя в абс. знач.",
-                "timer_to_next_collection": "2 часа",
-                "availability_time": "2 суток",
-                "targeting": "en"
-            }
-        };
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // Функция для отображения заданий с полями ввода
-        function displayTasks(tasks) {
-            const tasksContainer = document.getElementById('tasks-container');
+        // Получаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramsDiv = document.getElementById('params');
 
-            for (const taskId in tasks) {
-                const task = tasks[taskId];
+        // Выводим параметры на экран
+        urlParams.forEach((value, key) => {
+            const paramText = document.createElement('p');
+            paramText.textContent = `${key}: ${value}`;
+            paramsDiv.appendChild(paramText);
+        });
 
-                // Создаем блок для задания
-                const taskElement = document.createElement('div');
-                taskElement.className = 'task';
-
-                // Добавляем заголовок задания
-                const taskTitle = document.createElement('h2');
-                taskTitle.textContent = task.name;
-                taskElement.appendChild(taskTitle);
-
-                // Поле ввода для описания
-                const descriptionLabel = document.createElement('label');
-                descriptionLabel.textContent = 'Описание:';
-                taskElement.appendChild(descriptionLabel);
-
-                const descriptionInput = document.createElement('textarea');
-                descriptionInput.value = task.description;
-                taskElement.appendChild(descriptionInput);
-
-                // Поле ввода для способа показа
-                const displayMethodLabel = document.createElement('label');
-                displayMethodLabel.textContent = 'Способ показа:';
-                taskElement.appendChild(displayMethodLabel);
-
-                const displayMethodInput = document.createElement('input');
-                displayMethodInput.value = task.display_method;
-                taskElement.appendChild(displayMethodInput);
-
-                // Поле ввода для вида награды (выпадающий список)
-                const rewardTypeLabel = document.createElement('label');
-                rewardTypeLabel.textContent = 'Вид награды:';
-                taskElement.appendChild(rewardTypeLabel);
-
-                const rewardTypeSelect = document.createElement('select');
-                const rewardTypeOption1 = document.createElement('option');
-                rewardTypeOption1.value = "ресурсы в % от часа";
-                rewardTypeOption1.textContent = "ресурсы в % от часа";
-                const rewardTypeOption2 = document.createElement('option');
-                rewardTypeOption2.value = "темная материя в абс. знач.";
-                rewardTypeOption2.textContent = "темная материя в абс. знач.";
-                rewardTypeSelect.appendChild(rewardTypeOption1);
-                rewardTypeSelect.appendChild(rewardTypeOption2);
-                rewardTypeSelect.value = task.reward_type; // Устанавливаем текущее значение
-                taskElement.appendChild(rewardTypeSelect);
-
-                // Поле ввода для таймера до следующего сбора
-                const timerLabel = document.createElement('label');
-                timerLabel.textContent = 'Таймер до следующего сбора:';
-                taskElement.appendChild(timerLabel);
-
-                const timerInput = document.createElement('input');
-                timerInput.value = task.timer_to_next_collection;
-                taskElement.appendChild(timerInput);
-
-                // Поле ввода для времени доступности
-                const availabilityTimeLabel = document.createElement('label');
-                availabilityTimeLabel.textContent = 'Время доступности:';
-                taskElement.appendChild(availabilityTimeLabel);
-
-                const availabilityTimeInput = document.createElement('input');
-                availabilityTimeInput.value = task.availability_time;
-                taskElement.appendChild(availabilityTimeInput);
-
-                // Поле ввода для таргетинга
-                const targetingLabel = document.createElement('label');
-                targetingLabel.textContent = 'Таргетинг:';
-                taskElement.appendChild(targetingLabel);
-
-                const targetingInput = document.createElement('input');
-                targetingInput.value = task.targeting;
-                taskElement.appendChild(targetingInput);
-
-                // Кнопка для сохранения изменений
-                const saveButton = document.createElement('button');
-                saveButton.textContent = 'Сохранить изменения';
-                saveButton.addEventListener('click', async () => {
-                    // Обновляем данные задания
-                    const updatedTask = {
-                        name: task.name,
-                        description: descriptionInput.value,
-                        display_method: displayMethodInput.value,
-                        reward_type: rewardTypeSelect.value,
-                        timer_to_next_collection: timerInput.value,
-                        availability_time: availabilityTimeInput.value,
-                        targeting: targetingInput.value
-                    };
-
-                    // Отправляем данные на сервер
-                    try {
-                        const response = await fetch('/update-task', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ taskId, updatedTask })
-                        });
-
-                        if (response.ok) {
-                            alert('Изменения сохранены и отправлены в Telegram!');
-                        } else {
-                            alert('Ошибка при отправке данных.');
-                        }
-                    } catch (error) {
-                        console.error('Ошибка:', error);
-                        alert('Ошибка при отправке данных.');
-                    }
-                });
-                taskElement.appendChild(saveButton);
-
-                // Добавляем задание в контейнер
-                tasksContainer.appendChild(taskElement);
-            }
-        }
-
-        // Выводим задания на экран
-        displayTasks(tasksDict);
+        // Обработчик нажатия на кнопку сохранения
+        document.getElementById('saveButton').addEventListener('click', () => {
+            const data = 'Пример данных для сохранения';
+            tg.sendData(data); // Отправляем данные в Telegram
+            tg.close(); // Закрываем веб-приложение
+        });
     </script>
 </body>
 </html>
