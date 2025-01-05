@@ -1,86 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Tasks</title>
+    <title>Задания</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .task {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .task h2 {
+            margin-top: 0;
+        }
+        .task p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Edit Tasks</h1>
-    <form id="taskForm">
-        <div id="tasksContainer"></div>
-        <button type="submit">Save</button>
-    </form>
+    <h1>Список заданий</h1>
+    <div id="tasks-container"></div>
 
     <script>
-        // Функция для извлечения параметров из URL
+        // Функция для парсинга параметров URL
         function getQueryParams() {
             const params = {};
-            window.location.search.substring(1).split('&').forEach(param => {
-                const [key, value] = param.split('=');
-                params[key] = decodeURIComponent(value);
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split('&');
+
+            pairs.forEach(pair => {
+                const [key, value] = pair.split('=');
+                if (key && value) {
+                    params[key] = decodeURIComponent(value);
+                }
             });
+
             return params;
         }
 
-        // Функция для создания полей ввода для каждого задания
-        function createTaskFields(taskId, taskData) {
-            const container = document.createElement('div');
-            container.innerHTML = `<h2>Task: ${taskId}</h2>`;
+        // Функция для отображения заданий
+        function displayTasks() {
+            const tasksContainer = document.getElementById('tasks-container');
+            const queryParams = getQueryParams();
 
-            for (const [key, value] of Object.entries(taskData)) {
-                const label = document.createElement('label');
-                label.innerText = key.replace('_', ' ') + ': ';
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.name = `${taskId}_${key}`;
-                input.value = value;
-                container.appendChild(label);
-                container.appendChild(input);
-                container.appendChild(document.createElement('br'));
-            }
+            // Очищаем контейнер перед добавлением новых данных
+            tasksContainer.innerHTML = '';
 
-            return container;
-        }
-
-        // Функция для инициализации формы
-        function initForm() {
-            const params = getQueryParams();
-            const tasksContainer = document.getElementById('tasksContainer');
-
-            for (const [key, value] of Object.entries(params)) {
+            // Перебираем все параметры URL
+            for (const key in queryParams) {
                 if (key.startsWith('task_id')) {
-                    const taskId = value.split('|')[0].split('=')[1];
-                    const taskData = {};
-                    value.split('|').forEach(param => {
-                        const [k, v] = param.split('=');
-                        taskData[k] = v;
+                    const taskData = queryParams[key].split('|');
+                    const task = {};
+
+                    // Парсим данные задания
+                    taskData.forEach(item => {
+                        const [itemKey, itemValue] = item.split('=');
+                        task[itemKey] = itemValue;
                     });
-                    tasksContainer.appendChild(createTaskFields(taskId, taskData));
+
+                    // Создаем HTML для задания
+                    const taskElement = document.createElement('div');
+                    taskElement.className = 'task';
+
+                    const taskTitle = document.createElement('h2');
+                    taskTitle.textContent = task.name || 'Название задания';
+                    taskElement.appendChild(taskTitle);
+
+                    const taskDescription = document.createElement('p');
+                    taskDescription.textContent = `Описание: ${task.description || 'Описание отсутствует'}`;
+                    taskElement.appendChild(taskDescription);
+
+                    const taskDisplayMethod = document.createElement('p');
+                    taskDisplayMethod.textContent = `Метод отображения: ${task.display_method || 'Не указан'}`;
+                    taskElement.appendChild(taskDisplayMethod);
+
+                    const taskRewardType = document.createElement('p');
+                    taskRewardType.textContent = `Тип награды: ${task.reward_type || 'Не указан'}`;
+                    taskElement.appendChild(taskRewardType);
+
+                    const taskTimer = document.createElement('p');
+                    taskTimer.textContent = `Таймер до следующего сбора: ${task.timer_to_next_collection || 'Не указан'} минут`;
+                    taskElement.appendChild(taskTimer);
+
+                    const taskAvailability = document.createElement('p');
+                    taskAvailability.textContent = `Доступно дней: ${task.availability_time_days || 'Не указано'}`;
+                    taskElement.appendChild(taskAvailability);
+
+                    const taskTargeting = document.createElement('p');
+                    taskTargeting.textContent = `Целевая аудитория: ${task.targeting || 'Не указана'}`;
+                    taskElement.appendChild(taskTargeting);
+
+                    // Добавляем задание в контейнер
+                    tasksContainer.appendChild(taskElement);
                 }
             }
         }
 
-        // Обработчик отправки формы
-        document.getElementById('taskForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const data = {};
-
-            formData.forEach((value, key) => {
-                const [taskId, field] = key.split('_');
-                if (!data[taskId]) {
-                    data[taskId] = {};
-                }
-                data[taskId][field] = value;
-            });
-
-            // Отправляем данные обратно в Telegram бот
-            Telegram.WebApp.sendData(JSON.stringify(data));
-        });
-
-        // Инициализация формы при загрузке страницы
-        initForm();
+        // Вызываем функцию отображения заданий при загрузке страницы
+        window.onload = displayTasks;
     </script>
 </body>
 </html>
