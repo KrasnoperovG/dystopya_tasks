@@ -2,7 +2,7 @@
 <html>
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Настройки</title>
+    <title>Редактирование заданий</title>
     <style>
         body {
             color: var(--tg-theme-text-color);
@@ -11,22 +11,51 @@
             flex-direction: column;
             align-items: center;
             font-size: 15px;
+            padding: 20px;
+        }
+
+        .task-block {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .task-block label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .task-block input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
         button {
-            background: White;
-            color: Black;
+            background: #4169E1;
+            color: white;
             border: none;
-            font-size: 15px;
             padding: 10px 20px;
-            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #3556b7;
         }
     </style>
 </head>
 <body>
-    <h1>Параметры:</h1>
-    <div id="params"></div>
-    <button id="saveButton">Сохранить настройки</button>
+    <h1>Редактирование заданий</h1>
+    <div id="tasks-container"></div>
+    <button id="saveButton">Сохранить изменения</button>
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -34,21 +63,74 @@
 
         // Получаем параметры из URL
         const urlParams = new URLSearchParams(window.location.search);
-        const paramsDiv = document.getElementById('params');
 
-        // Выводим параметры на экран
-        urlParams.forEach((value, key) => {
-            const paramText = document.createElement('p');
-            paramText.textContent = `${key}: ${value}`;
-            paramsDiv.appendChild(paramText);
-        });
+        // Функция для создания блока задания
+        function createTaskBlock(taskId, taskData) {
+            const taskBlock = document.createElement('div');
+            taskBlock.className = 'task-block';
 
-        // Обработчик нажатия на кнопку сохранения
+            // Добавляем поля ввода для каждого свойства задания
+            for (const [key, value] of Object.entries(taskData)) {
+                const label = document.createElement('label');
+                label.textContent = key.replace(/_/g, ' '); // Заменяем подчеркивания на пробелы
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = value;
+                input.id = `${taskId}-${key}`; // Уникальный ID для каждого поля
+
+                taskBlock.appendChild(label);
+                taskBlock.appendChild(input);
+            }
+
+            return taskBlock;
+        }
+
+        // Функция для загрузки заданий из URL
+        function loadTasks() {
+            const tasksContainer = document.getElementById('tasks-container');
+
+            // Перебираем все параметры из URL
+            urlParams.forEach((value, key) => {
+                if (key.startsWith('task_id')) {
+                    // Создаем объект с данными задания
+                    const taskData = {};
+                    const taskElements = value.split('|');
+                    taskElements.forEach(element => {
+                        const [dataKey, dataValue] = element.split('=');
+                        taskData[dataKey] = dataValue.replace(/_/g, ' '); // Заменяем подчеркивания на пробелы
+                    });
+
+                    // Создаем блок задания и добавляем его в контейнер
+                    const taskBlock = createTaskBlock(key, taskData);
+                    tasksContainer.appendChild(taskBlock);
+                }
+            });
+        }
+
+        // Обработчик нажатия на кнопку "Сохранить изменения"
         document.getElementById('saveButton').addEventListener('click', () => {
-            const data = 'Пример данных для сохранения';
-            tg.sendData(data); // Отправляем данные в Telegram
+            const tasksData = {};
+
+            // Собираем данные из всех блоков заданий
+            const taskBlocks = document.querySelectorAll('.task-block');
+            taskBlocks.forEach(taskBlock => {
+                const inputs = taskBlock.querySelectorAll('input');
+                const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
+                tasksData[taskId] = {};
+
+                inputs.forEach(input => {
+                    const key = input.id.split('-')[1];
+                    tasksData[taskId][key] = input.value;
+                });
+            });
+
+            // Отправляем данные в Telegram
+            tg.sendData(JSON.stringify(tasksData));
             tg.close(); // Закрываем веб-приложение
         });
+
+        // Загружаем задания при загрузке страницы
+        loadTasks();
     </script>
 </body>
 </html>
