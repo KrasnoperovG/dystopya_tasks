@@ -57,16 +57,24 @@
             const tableBody = document.querySelector('#taskTable tbody');
 
             for (const [key, value] of Object.entries(params)) {
-                const row = document.createElement('tr');
-                const keyCell = document.createElement('td');
-                const valueCell = document.createElement('td');
+                // Разделяем значение по символу "|"
+                const parts = value.split('|');
+                for (const part of parts) {
+                    // Разделяем каждую часть на ключ и значение
+                    const [subKey, subValue] = part.split('=');
+                    if (subKey && subValue) {
+                        const row = document.createElement('tr');
+                        const keyCell = document.createElement('td');
+                        const valueCell = document.createElement('td');
 
-                keyCell.textContent = key;
-                valueCell.textContent = value;
+                        keyCell.textContent = subKey;
+                        valueCell.textContent = subValue;
 
-                row.appendChild(keyCell);
-                row.appendChild(valueCell);
-                tableBody.appendChild(row);
+                        row.appendChild(keyCell);
+                        row.appendChild(valueCell);
+                        tableBody.appendChild(row);
+                    }
+                }
             }
         }
 
