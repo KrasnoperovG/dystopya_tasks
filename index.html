@@ -27,7 +27,8 @@
             margin: 5px 0;
             color: #666; /* Светло-серый цвет для подписей полей ввода */
         }
-        .task input {
+        .task input,
+        .task select {
             width: 100%;
             padding: 5px;
             margin-bottom: 10px;
@@ -90,11 +91,48 @@
                         label.textContent = `${key}:`;
                         taskDiv.appendChild(label);
 
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = value;
-                        input.id = `${taskId}-${key}`; // Уникальный ID для каждого поля
-                        taskDiv.appendChild(input);
+                        if (key === "display_method" || key === "reward_type") {
+                            // Создаем выпадающий список для display_method и reward_type
+                            const select = document.createElement('select');
+                            select.id = `${taskId}-${key}`;
+
+                            // Варианты для display_method
+                            if (key === "display_method") {
+                                const option1 = document.createElement('option');
+                                option1.value = "for_time";
+                                option1.textContent = "for_time";
+                                select.appendChild(option1);
+
+                                const option2 = document.createElement('option');
+                                option2.value = "for_subscribes";
+                                option2.textContent = "for_subscribes";
+                                select.appendChild(option2);
+                            }
+
+                            // Варианты для reward_type
+                            if (key === "reward_type") {
+                                const option1 = document.createElement('option');
+                                option1.value = "matter";
+                                option1.textContent = "matter";
+                                select.appendChild(option1);
+
+                                const option2 = document.createElement('option');
+                                option2.value = "resources";
+                                option2.textContent = "resources";
+                                select.appendChild(option2);
+                            }
+
+                            // Устанавливаем выбранное значение
+                            select.value = value;
+                            taskDiv.appendChild(select);
+                        } else {
+                            // Для остальных полей создаем текстовое поле ввода
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value;
+                            input.id = `${taskId}-${key}`;
+                            taskDiv.appendChild(input);
+                        }
                     }
 
                     tasksContainer.appendChild(taskDiv);
@@ -107,7 +145,7 @@
                     const taskBlocks = document.querySelectorAll('.task');
 
                     taskBlocks.forEach(taskBlock => {
-                        const inputs = taskBlock.querySelectorAll('input');
+                        const inputs = taskBlock.querySelectorAll('input, select');
                         const taskId = inputs[0].id.split('-')[0]; // Получаем ID задания
                         tasksData[taskId] = {};
 
