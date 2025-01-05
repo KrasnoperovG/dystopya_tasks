@@ -69,32 +69,17 @@
                     taskElement.className = 'task';
 
                     const taskTitle = document.createElement('h2');
-                    taskTitle.textContent = task.name || 'Название задания';
+                    taskTitle.textContent = `Задание: ${task.task_id || 'Нет ID'}`;
                     taskElement.appendChild(taskTitle);
 
-                    const taskDescription = document.createElement('p');
-                    taskDescription.textContent = `Описание: ${task.description || 'Описание отсутствует'}`;
-                    taskElement.appendChild(taskDescription);
-
-                    const taskDisplayMethod = document.createElement('p');
-                    taskDisplayMethod.textContent = `Метод отображения: ${task.display_method || 'Не указан'}`;
-                    taskElement.appendChild(taskDisplayMethod);
-
-                    const taskRewardType = document.createElement('p');
-                    taskRewardType.textContent = `Тип награды: ${task.reward_type || 'Не указан'}`;
-                    taskElement.appendChild(taskRewardType);
-
-                    const taskTimer = document.createElement('p');
-                    taskTimer.textContent = `Таймер до следующего сбора: ${task.timer_to_next_collection || 'Не указан'} минут`;
-                    taskElement.appendChild(taskTimer);
-
-                    const taskAvailability = document.createElement('p');
-                    taskAvailability.textContent = `Доступно дней: ${task.availability_time_days || 'Не указано'}`;
-                    taskElement.appendChild(taskAvailability);
-
-                    const taskTargeting = document.createElement('p');
-                    taskTargeting.textContent = `Целевая аудитория: ${task.targeting || 'Не указана'}`;
-                    taskElement.appendChild(taskTargeting);
+                    // Перебираем все поля задания и отображаем их
+                    for (const field in task) {
+                        if (field !== 'task_id') { // Пропускаем task_id, так как он уже в заголовке
+                            const fieldElement = document.createElement('p');
+                            fieldElement.textContent = `${field}: ${task[field] || 'Не указано'}`;
+                            taskElement.appendChild(fieldElement);
+                        }
+                    }
 
                     // Добавляем задание в контейнер
                     tasksContainer.appendChild(taskElement);
