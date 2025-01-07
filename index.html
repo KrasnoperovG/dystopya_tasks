@@ -129,6 +129,21 @@
             }
         }
 
+        // Порядок полей для отображения
+        const fieldOrder = [
+            "name",
+            "description",
+            "target_method",
+            "target_value",
+            "bonus_type",
+            "bonus_size",
+            "next_collection",
+            "availability_days",
+            "targeting",
+            "link",
+            "link_name" // Новое поле
+        ];
+
         // Функция для отображения заданий
         function renderTasks() {
             const tasksContainer = document.getElementById('tasks-container');
@@ -149,83 +164,86 @@
                 deleteButton.onclick = () => deleteTask(taskId);
                 taskDiv.appendChild(deleteButton);
 
-                for (const [key, value] of Object.entries(taskData)) {
-                    const fieldDiv = document.createElement('div');
-                    fieldDiv.className = 'field';
+                // Отображаем поля в заданном порядке
+                fieldOrder.forEach(key => {
+                    if (taskData.hasOwnProperty(key)) {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'field';
 
-                    const label = document.createElement('label');
-                    label.textContent = `${key}:`;
-                    fieldDiv.appendChild(label);
+                        const label = document.createElement('label');
+                        label.textContent = `${key}:`;
+                        fieldDiv.appendChild(label);
 
-                    if (key === "target_method" || key === "bonus_type" || key === "targeting") {
-                        // Создаем выпадающий список для target_method, bonus_type и targeting
-                        const select = document.createElement('select');
-                        select.id = `${taskId}-${key}`;
+                        if (key === "target_method" || key === "bonus_type" || key === "targeting") {
+                            // Создаем выпадающий список для target_method, bonus_type и targeting
+                            const select = document.createElement('select');
+                            select.id = `${taskId}-${key}`;
 
-                        // Варианты для target_method
-                        if (key === "target_method") {
-                            const option1 = document.createElement('option');
-                            option1.value = "for_time";
-                            option1.textContent = "for_time";
-                            select.appendChild(option1);
+                            // Варианты для target_method
+                            if (key === "target_method") {
+                                const option1 = document.createElement('option');
+                                option1.value = "for_time";
+                                option1.textContent = "for_time";
+                                select.appendChild(option1);
 
-                            const option2 = document.createElement('option');
-                            option2.value = "for_subscribes";
-                            option2.textContent = "for_subscribes";
-                            select.appendChild(option2);
+                                const option2 = document.createElement('option');
+                                option2.value = "for_subscribes";
+                                option2.textContent = "for_subscribes";
+                                select.appendChild(option2);
+                            }
+
+                            // Варианты для bonus_type
+                            if (key === "bonus_type") {
+                                const option1 = document.createElement('option');
+                                option1.value = "matter";
+                                option1.textContent = "matter";
+                                select.appendChild(option1);
+
+                                const option2 = document.createElement('option');
+                                option2.value = "resources";
+                                option2.textContent = "resources";
+                                select.appendChild(option2);
+                            }
+
+                            // Варианты для targeting
+                            if (key === "targeting") {
+                                const option1 = document.createElement('option');
+                                option1.value = "ru";
+                                option1.textContent = "ru";
+                                select.appendChild(option1);
+
+                                const option2 = document.createElement('option');
+                                option2.value = "en";
+                                option2.textContent = "en";
+                                select.appendChild(option2);
+
+                                const option3 = document.createElement('option');
+                                option3.value = "all";
+                                option3.textContent = "all";
+                                select.appendChild(option3);
+                            }
+
+                            // Устанавливаем выбранное значение
+                            select.value = taskData[key];
+                            fieldDiv.appendChild(select);
+                        } else if (key === "description") {
+                            // Для поля description создаем textarea
+                            const textarea = document.createElement('textarea');
+                            textarea.value = taskData[key];
+                            textarea.id = `${taskId}-${key}`;
+                            fieldDiv.appendChild(textarea);
+                        } else {
+                            // Для остальных полей создаем текстовое поле ввода
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = taskData[key];
+                            input.id = `${taskId}-${key}`;
+                            fieldDiv.appendChild(input);
                         }
 
-                        // Варианты для bonus_type
-                        if (key === "bonus_type") {
-                            const option1 = document.createElement('option');
-                            option1.value = "matter";
-                            option1.textContent = "matter";
-                            select.appendChild(option1);
-
-                            const option2 = document.createElement('option');
-                            option2.value = "resources";
-                            option2.textContent = "resources";
-                            select.appendChild(option2);
-                        }
-
-                        // Варианты для targeting
-                        if (key === "targeting") {
-                            const option1 = document.createElement('option');
-                            option1.value = "ru";
-                            option1.textContent = "ru";
-                            select.appendChild(option1);
-
-                            const option2 = document.createElement('option');
-                            option2.value = "en";
-                            option2.textContent = "en";
-                            select.appendChild(option2);
-
-                            const option3 = document.createElement('option');
-                            option3.value = "all";
-                            option3.textContent = "all";
-                            select.appendChild(option3);
-                        }
-
-                        // Устанавливаем выбранное значение
-                        select.value = value;
-                        fieldDiv.appendChild(select);
-                    } else if (key === "description") {
-                        // Для поля description создаем textarea
-                        const textarea = document.createElement('textarea');
-                        textarea.value = value;
-                        textarea.id = `${taskId}-${key}`;
-                        fieldDiv.appendChild(textarea);
-                    } else {
-                        // Для остальных полей создаем текстовое поле ввода
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = value;
-                        input.id = `${taskId}-${key}`;
-                        fieldDiv.appendChild(input);
+                        taskDiv.appendChild(fieldDiv);
                     }
-
-                    taskDiv.appendChild(fieldDiv);
-                }
+                });
 
                 tasksContainer.appendChild(taskDiv);
             }
